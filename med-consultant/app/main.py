@@ -1,4 +1,5 @@
 from datetime import datetime
+import time
 
 from models.user import (
     User,
@@ -34,6 +35,10 @@ def main() -> None:
     print(f"Dialogue: {dialogue}")
     print(f"Query: {query}")
     print(f"Query processing status: {query.status}")
+
+    print("entering loop ...")
+    while True:
+        time.sleep(1)
 
 
 if __name__ == "__main__":
