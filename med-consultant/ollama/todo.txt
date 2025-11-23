@@ -1,0 +1,2 @@
+1. ollama pull thewindmom/llama3-med42-8b
+2. curl http://ollama:11434/api/generate -d '{"model": "thewindmom/llama3-med42-8b", "prompt": "i have a toothache. What is the reason?"}'
