@@ -1,1 +1,7 @@
-SQLAlchemy==2.0.31
+asyncpg
+psycopg
+psycopg-binary
+pydantic
+pydantic-settings
+sqlmodel
+starlette

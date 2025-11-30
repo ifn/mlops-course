@@ -1,19 +1,24 @@
+from dataclasses import dataclass
+from datetime import datetime
+from enum import Enum
+from sqlmodel import SQLModel, Field, Relationship
+from typing import Optional, List, TYPE_CHECKING
+from datetime import datetime
+
 from dataclasses import dataclass, field, InitVar
 from datetime import datetime
 
 from .ml_task import MLTask, MLTaskStatus
 
 
-@dataclass
-class Dialogue:
+class Dialogue(SQLModel, table=True):
     id: int
     user_id: int
     created_at: datetime
     topics: list[str] = field(default_factory=list)
 
 
-@dataclass
-class LLMQuery:
+class LLMQuery(SQLModel, table=True):
     dialogue_id: int
     query: str
     response: str | None = None
