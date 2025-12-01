@@ -1,0 +1,5 @@
+1. py package versions
+2. medc: create schema
+CREATE SCHEMA medc;
+GRANT ALL PRIVILEGES ON DATABASE medc TO postgres;
+3. models: fix circular imports

@@ -1,6 +1,11 @@
-from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
+from typing import Optional, TYPE_CHECKING
+
+from sqlmodel import SQLModel, Field, Relationship
+
+if TYPE_CHECKING:
+    from models.llm_query import LLMQuery
 
 
 class MLTaskStatus(Enum):
@@ -10,9 +15,10 @@ class MLTaskStatus(Enum):
     FAILED = "failed"
 
 
-@dataclass
-class MLTask:
-    id: int
-    created_at: datetime
-    status: MLTaskStatus = MLTaskStatus.NOT_STARTED
-    termination_time: datetime | None = None
+class MLTask(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    status: MLTaskStatus = Field(default=MLTaskStatus.NOT_STARTED)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    termination_time: Optional[datetime] = None
+
+    llm_query: Optional["LLMQuery"] = Relationship(back_populates="ml_task")
