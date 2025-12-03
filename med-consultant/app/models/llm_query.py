@@ -5,6 +5,7 @@ from sqlmodel import SQLModel, Field, Relationship
 
 if TYPE_CHECKING:
     from models.ml_task import MLTask, MLTaskStatus
+    from models.user import User
     from models.dialogue import Dialogue
 
 
@@ -12,8 +13,13 @@ class LLMQuery(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     query: str
     response: Optional[str] = None
-    dialogue_id: int = Field(foreign_key="dialogue.id")
+
+    user_id: int = Field(foreign_key="user.id")
+    user: "User" = Relationship(back_populates="queries")
+
+    dialogue_id: Optional[int] = Field(foreign_key="dialogue.id")
     dialogue: Optional["Dialogue"] = Relationship(back_populates="queries")
+
     ml_task_id: Optional[int] = Field(foreign_key="mltask.id")
     ml_task: Optional["MLTask"] = Relationship(back_populates="llm_query")
 

@@ -12,9 +12,12 @@ if TYPE_CHECKING:
 class Dialogue(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    queries: List["LLMQuery"] = Relationship(back_populates="dialogue")
+
     user_id: Optional[int] = Field(foreign_key="user.id")
     user: Optional["User"] = Relationship(back_populates="dialogues")
+
+    queries: List["LLMQuery"] = Relationship(back_populates="dialogue")
+
     topics: List[str] = Field(
         sa_column=Column(JSON),
         default_factory=list,

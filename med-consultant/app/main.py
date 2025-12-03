@@ -9,6 +9,7 @@ from models.ml_task import (
 )
 from models.dialogue import Dialogue
 from models.llm_query import LLMQuery
+from models.billing import Balance
 from services.crud.user import (
     create_user,
     get_all_users,
@@ -76,6 +77,7 @@ def main() -> None:
         print("-" * 100)
 
         query1 = LLMQuery(
+            user_id=userA.id,
             dialogue_id=dialogueA1.id,
             query="i feel pain in my knee after basketball. what are the reasons?",
         )
@@ -83,6 +85,7 @@ def main() -> None:
         print(query1)
         print(query1.dialogue)
         query2 = LLMQuery(
+            user_id=userA.id,
             dialogue_id=dialogueA1.id,
             query='how can i check "Meniscal tears" version?',
         )

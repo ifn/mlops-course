@@ -5,3 +5,5 @@ pydantic
 pydantic-settings
 sqlmodel
 starlette
+fastapi
+uvicorn

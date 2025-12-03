@@ -115,7 +115,7 @@ def delete_llm_query(session: Session, llm_query_id: int) -> bool:
         bool: True if deleted, False if not found
     """
     try:
-        llm_query = get_llm_query_by_id(llm_query_id, session)
+        llm_query = get_llm_query_by_id(session, llm_query_id)
         if not llm_query:
             return False
 

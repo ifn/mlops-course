@@ -1,8 +1,12 @@
 from datetime import datetime
 from enum import Enum
+from typing import Optional, List, TYPE_CHECKING
 
+from sqlmodel import SQLModel, Field, Relationship
+from sqlalchemy import Column, JSON
 
-from sqlmodel import SQLModel
+if TYPE_CHECKING:
+    from models.user import User
 
 
 class TransactionType(Enum):
@@ -10,15 +14,21 @@ class TransactionType(Enum):
     WITHDRAWAL = "withdrawal"
 
 
-class Balance(SQLModel, table=True):
-    id: int
-    user_id: int
-    amount: int
-    updated_at: datetime
-
-
 class FinancialTransaction(SQLModel, table=True):
-    id: int
-    balance_id: int
-    amount: int
-    created_at: datetime
+    id: Optional[int] = Field(default=None, primary_key=True)
+    amount: float = Field(default=0.0)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    balance_id: int = Field(foreign_key="balance.id")
+    balance: Optional["Balance"] = Relationship(back_populates="transactions")
+
+
+class Balance(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    amount: float = Field(default=0.0)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+    user_id: int = Field(foreign_key="user.id")
+    user: Optional["User"] = Relationship(back_populates="balance")
+
+    transactions: List["FinancialTransaction"] = Relationship(back_populates="balance")
