@@ -7,7 +7,7 @@ from sqlmodel import SQLModel, Field, Relationship
 if TYPE_CHECKING:
     from models.dialogue import Dialogue
     from models.llm_query import LLMQuery
-    from models.billing import Balance
+    from models.billing.balance import Balance
 
 
 class Sex(Enum):
@@ -26,12 +26,15 @@ class User(SQLModel, table=True):
     sex: Sex | None = None
     age: int | None = None
 
-    queries: List["LLMQuery"] = Relationship(back_populates="user")
+    queries: List["LLMQuery"] = Relationship(
+        back_populates="user",
+    )
     dialogues: List["Dialogue"] = Relationship(
         back_populates="user",
         sa_relationship_kwargs={"cascade": "all, delete-orphan", "lazy": "selectin"},
     )
 
+    balance_id: int = Field(foreign_key="balance.id")
     balance: "Balance" = Relationship(back_populates="user")
 
     class Config:

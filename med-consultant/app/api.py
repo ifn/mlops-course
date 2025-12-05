@@ -15,7 +15,8 @@ from models.user import User
 from models.ml_task import MLTask
 from models.dialogue import Dialogue
 from models.llm_query import LLMQuery
-from models.billing import Balance
+from models.billing.balance import Balance
+from models.billing.transaction import FinancialTransaction
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
