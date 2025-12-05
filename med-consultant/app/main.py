@@ -9,7 +9,8 @@ from models.ml_task import (
 )
 from models.dialogue import Dialogue
 from models.llm_query import LLMQuery
-from models.billing import Balance
+from models.billing.balance import Balance
+from models.billing.transaction import FinancialTransaction, TransactionFactory
 from services.crud.user import (
     create_user,
     get_all_users,
@@ -22,18 +23,17 @@ from services.crud.llm_query import (
     create_llm_query,
     get_llm_query_by_id,
 )
+from services.crud.billing.balance import (
+    create_balance,
+)
+from services.crud.billing.transaction import (
+    create_transaction,
+    get_all_transactions,
+    get_transaction_by_id,
+)
 
 
 def main() -> None:
-    userA = User(
-        email="manA@mail.tr",
-        password="123456",
-    )
-    userB = User(
-        email="ivan@mail.ru",
-        password="123456",
-    )
-
     init_db(drop_all=True)
     print("Init db finished successfully")
 
@@ -41,9 +41,30 @@ def main() -> None:
 
     with Session(engine) as session:
         print("-" * 100)
+        print("Balance:")
+        print("-" * 100)
+
+        balanceA = Balance()
+        balanceB = Balance()
+        create_balance(session, balanceA)
+        print(balanceA)
+        create_balance(session, balanceB)
+        print(balanceB)
+
+        print("-" * 100)
         print("Users:")
         print("-" * 100)
 
+        userA = User(
+            email="manA@mail.tr",
+            password="123456",
+            balance_id=balanceA.id,
+        )
+        userB = User(
+            email="ivan@mail.ru",
+            password="123456",
+            balance_id=balanceB.id,
+        )
         create_user(session, userA)
         print(userA)
         create_user(session, userB)
@@ -97,6 +118,33 @@ def main() -> None:
         q2 = get_llm_query_by_id(session, query2.id)
         print(q2.dialogue.queries)
         print(q2.ml_task)
+
+        print("-" * 100)
+        print("Financial transactions:")
+        print("-" * 100)
+
+        dep = TransactionFactory.create_deposit(23.5, userA.balance_id)
+        create_transaction(session, dep)
+        print(dep)
+        print(dep.balance)
+        dep2 = TransactionFactory.create_deposit(7.49, userA.balance_id)
+        create_transaction(session, dep2)
+        print(dep2)
+        print(userA.balance)
+        dep.approve()
+        print(userA.balance)
+        dep2.approve()
+        print(userA.balance)
+        wd = TransactionFactory.create_withdrawal(10.49, userA.balance_id)
+        create_transaction(session, wd)
+        print(wd)
+        wd.approve()
+        print(userA.balance)
+
+        print(userB.balance)
+
+        print(get_all_transactions(session))
+        print(get_transaction_by_id(session, 3))
 
     print("entering loop ...")
     while True:
