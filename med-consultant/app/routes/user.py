@@ -5,7 +5,10 @@ from fastapi import APIRouter, HTTPException, status, Depends
 
 from database.database import get_session
 from models.user import User
+from models.billing.balance import Balance
 from services.crud import user as UserService
+from services.crud.billing import balance as BalanceService
+from routes.models.user_response import UserResponse
 
 
 logger = logging.getLogger(__name__)
@@ -14,12 +17,12 @@ user_route = APIRouter()
 
 
 @user_route.get(
-    "/get_all_users",
-    response_model=List[User],
+    "/",
+    response_model=List[UserResponse],
     summary="Get all users",
     response_description="List of all users",
 )
-async def get_all_users(session=Depends(get_session)) -> List[User]:
+async def get_all_users(session=Depends(get_session)) -> List[UserResponse]:
     """
     Get list of all users.
 
@@ -32,7 +35,9 @@ async def get_all_users(session=Depends(get_session)) -> List[User]:
     try:
         users = UserService.get_all_users(session)
         logger.info(f"Retrieved {len(users)} users")
-        return users
+
+        users_resp = [UserResponse.form(user) for user in users]
+        return users_resp
     except Exception as e:
         logger.error(f"Error retrieving users: {str(e)}")
         raise HTTPException(
@@ -73,8 +78,16 @@ async def signup(
                 detail="User with this email already exists",
             )
 
-        user = User(email=data.email, password=data.password)
+        balance = Balance()
+        BalanceService.create_balance(session, balance)
+
+        user = User(
+            email=data.email,
+            password=data.password,
+            balance_id=balance.id,
+        )
         UserService.create_user(session, user)
+
         logger.info(f"New user registered: {data.email}")
         return {"message": "User successfully registered"}
 

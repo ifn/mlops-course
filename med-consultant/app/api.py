@@ -9,6 +9,7 @@ from database.config import get_settings
 from routes.home import home_route
 from routes.user import user_route
 from routes.llm_query import llm_query_router
+from routes.billing.transaction import transaction_router
 
 # FIXME
 from models.user import User
@@ -51,6 +52,11 @@ def create_application() -> FastAPI:
     app.include_router(home_route, tags=["Home"])
     app.include_router(user_route, prefix="/api/users", tags=["Users"])
     app.include_router(llm_query_router, prefix="/api/llm_queries", tags=["LLMQueries"])
+    app.include_router(
+        transaction_router,
+        prefix="/api/transactions",
+        tags=["Transactions"],
+    )
 
     return app
 

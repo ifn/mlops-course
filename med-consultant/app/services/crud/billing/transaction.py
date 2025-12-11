@@ -43,7 +43,7 @@ def get_transaction_by_id(
             select(FinancialTransaction)
             .where(FinancialTransaction.id == transaction_id)
             .options(
-                selectinload(FinancialTransaction.balance),
+                selectinload(FinancialTransaction.user),
             )
         )
         transaction = session.exec(statement).first()

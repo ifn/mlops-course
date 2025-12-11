@@ -1,11 +1,10 @@
 from datetime import datetime
-from typing import Optional, List, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 
 from sqlmodel import SQLModel, Field, Relationship
 
 if TYPE_CHECKING:
     from models.user import User
-    from models.billing.transaction import FinancialTransaction
 
 
 class Balance(SQLModel, table=True):
@@ -14,5 +13,3 @@ class Balance(SQLModel, table=True):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
     user: Optional["User"] = Relationship(back_populates="balance")
-
-    transactions: List["FinancialTransaction"] = Relationship(back_populates="balance")

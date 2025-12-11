@@ -6,6 +6,7 @@ from abc import abstractmethod
 from sqlmodel import SQLModel, Field, Relationship
 
 if TYPE_CHECKING:
+    from models.user import User
     from models.billing.balance import Balance
 
 
@@ -46,8 +47,8 @@ class FinancialTransaction(SQLModel, table=True):
     amount: float = Field(default=0.0)
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
-    balance_id: int = Field(foreign_key="balance.id")
-    balance: Optional["Balance"] = Relationship(back_populates="transactions")
+    user_id: int = Field(foreign_key="user.id")
+    user: Optional["User"] = Relationship(back_populates="transactions")
 
     @property
     def _strategy(self) -> TransactionStrategy:
@@ -57,26 +58,26 @@ class FinancialTransaction(SQLModel, table=True):
         }[self.type]
 
     def is_permitted(self) -> bool:
-        return self._strategy.is_permitted(self.balance, self.amount)
+        return self._strategy.is_permitted(self.user.balance, self.amount)
 
     def approve(self) -> None:
-        self._strategy.apply(self.balance, self.amount)
-        self.balance.updated_at = self.created_at
+        self._strategy.apply(self.user.balance, self.amount)
+        self.user.balance.updated_at = self.created_at
 
 
 class TransactionFactory:
     @staticmethod
-    def create_deposit(amount: float, balance_id: int) -> FinancialTransaction:
+    def create_deposit(amount: float, user_id: int) -> FinancialTransaction:
         return FinancialTransaction(
             type=TransactionType.DEPOSIT,
             amount=amount,
-            balance_id=balance_id,
+            user_id=user_id,
         )
 
     @staticmethod
-    def create_withdrawal(amount: float, balance_id: int) -> FinancialTransaction:
+    def create_withdrawal(amount: float, user_id: int) -> FinancialTransaction:
         return FinancialTransaction(
             type=TransactionType.WITHDRAWAL,
             amount=amount,
-            balance_id=balance_id,
+            user_id=user_id,
         )

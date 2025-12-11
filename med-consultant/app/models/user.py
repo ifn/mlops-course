@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from models.dialogue import Dialogue
     from models.llm_query import LLMQuery
     from models.billing.balance import Balance
+    from models.billing.transaction import FinancialTransaction
 
 
 class Sex(Enum):
@@ -32,6 +33,9 @@ class User(SQLModel, table=True):
     dialogues: List["Dialogue"] = Relationship(
         back_populates="user",
         sa_relationship_kwargs={"cascade": "all, delete-orphan", "lazy": "selectin"},
+    )
+    transactions: List["FinancialTransaction"] = Relationship(
+        back_populates="user",
     )
 
     balance_id: int = Field(foreign_key="balance.id")
