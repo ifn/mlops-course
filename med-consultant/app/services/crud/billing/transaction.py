@@ -3,7 +3,7 @@ from typing import List, Optional
 from sqlmodel import Session, select
 from sqlalchemy.orm import selectinload
 
-from models.billing.transaction import FinancialTransaction
+from app.models.billing.transaction import FinancialTransaction
 
 
 def get_all_transactions(session: Session) -> List[FinancialTransaction]:

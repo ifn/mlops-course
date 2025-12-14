@@ -5,10 +5,10 @@ from typing import List, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 
 if TYPE_CHECKING:
-    from models.dialogue import Dialogue
-    from models.llm_query import LLMQuery
-    from models.billing.balance import Balance
-    from models.billing.transaction import FinancialTransaction
+    from app.models.dialogue import Dialogue
+    from app.models.llm_query import LLMQuery
+    from app.models.billing.balance import Balance
+    from app.models.billing.transaction import FinancialTransaction
 
 
 class Sex(Enum):

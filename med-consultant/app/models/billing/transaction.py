@@ -6,8 +6,8 @@ from abc import abstractmethod
 from sqlmodel import SQLModel, Field, Relationship
 
 if TYPE_CHECKING:
-    from models.user import User
-    from models.billing.balance import Balance
+    from app.models.user import User
+    from app.models.billing.balance import Balance
 
 
 class TransactionType(Enum):

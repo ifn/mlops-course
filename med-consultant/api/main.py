@@ -1,32 +1,35 @@
 import time
+from datetime import datetime
 
-from database.database import init_db, get_database_engine
+from app.database.database import init_db, get_database_engine
 from sqlmodel import Session
 
-from models.user import User
-from models.ml_task import (
+from app.models.user import User
+from app.models.ml_task import (
     MLTask,
+    MLTaskStatus,
 )
-from models.dialogue import Dialogue
-from models.llm_query import LLMQuery
-from models.billing.balance import Balance
-from models.billing.transaction import FinancialTransaction, TransactionFactory
-from services.crud.user import (
+from app.models.dialogue import Dialogue
+from app.models.llm_query import LLMQuery, LLMQueryUpdate
+from app.models.billing.balance import Balance
+from app.models.billing.transaction import FinancialTransaction, TransactionFactory
+from app.services.crud.user import (
     create_user,
     get_all_users,
 )
-from services.crud.dialogue import (
+from app.services.crud.dialogue import (
     create_dialogue,
     get_all_dialogues,
 )
-from services.crud.llm_query import (
+from app.services.crud.llm_query import (
     create_llm_query,
+    update_llm_query,
     get_llm_query_by_id,
 )
-from services.crud.billing.balance import (
+from app.services.crud.billing.balance import (
     create_balance,
 )
-from services.crud.billing.transaction import (
+from app.services.crud.billing.transaction import (
     create_transaction,
     get_all_transactions,
     get_transaction_by_id,
@@ -118,6 +121,20 @@ def main() -> None:
         q2 = get_llm_query_by_id(session, query2.id)
         print(q2.dialogue.queries)
         print(q2.ml_task)
+
+        qu = LLMQueryUpdate(
+            response="""Knee pain after playing basketball can be caused by various factors such as overuse, improper technique or training methods, or underlying medical conditions.
+1. Overuse: Prolonged repetitive strain on your knees can cause tendinitis (inflammation of the tendons) or a stress fracture in the surrounding bones.
+2. Improper Technique: Playing basketball without proper form or landing awkwardly after jumps may put excessive force on your knee joint, causing ligament sprains or meniscal tears.
+3. Underlying Conditions: Existing medical conditions such as osteoarthritis, patellofemoral pain syndrome (kneecap pain), or a previous injury can contribute to post-game knee pain.""",
+            ml_task_status=MLTaskStatus.COMPLETED,
+            ml_task_termination_time=datetime.now(),
+        )
+        update_llm_query(session, q2.id, qu)
+
+        q2up = get_llm_query_by_id(session, query2.id)
+        print(q2up)
+        print(q2up.ml_task)
 
         print("-" * 100)
         print("Financial transactions:")

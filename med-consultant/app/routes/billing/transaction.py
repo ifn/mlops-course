@@ -2,9 +2,9 @@ from typing import List
 
 from fastapi import APIRouter, HTTPException, status, Depends
 
-from database.database import get_session
-from models.billing.transaction import FinancialTransaction
-from services.crud.billing import transaction as TransactionService
+from app.database.database import get_session
+from app.models.billing.transaction import FinancialTransaction
+from app.services.crud.billing import transaction as TransactionService
 
 
 transaction_router = APIRouter()

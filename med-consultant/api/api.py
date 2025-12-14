@@ -4,20 +4,20 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
-from database.database import init_db
-from database.config import get_settings
-from routes.home import home_route
-from routes.user import user_route
-from routes.llm_query import llm_query_router
-from routes.billing.transaction import transaction_router
+from app.database.database import init_db
+from app.database.config import get_settings
+from app.routes.home import home_route
+from app.routes.user import user_route
+from app.routes.llm_query import llm_query_router
+from app.routes.billing.transaction import transaction_router
 
 # FIXME
-from models.user import User
-from models.ml_task import MLTask
-from models.dialogue import Dialogue
-from models.llm_query import LLMQuery
-from models.billing.balance import Balance
-from models.billing.transaction import FinancialTransaction
+from app.models.user import User
+from app.models.ml_task import MLTask
+from app.models.dialogue import Dialogue
+from app.models.llm_query import LLMQuery
+from app.models.billing.balance import Balance
+from app.models.billing.transaction import FinancialTransaction
 
 logger = logging.getLogger(__name__)
 settings = get_settings()

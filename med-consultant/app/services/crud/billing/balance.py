@@ -3,7 +3,7 @@ from typing import List, Optional
 from sqlmodel import Session, select
 from sqlalchemy.orm import selectinload
 
-from models.billing.balance import Balance
+from app.models.billing.balance import Balance
 
 
 def create_balance(session: Session, balance: Balance) -> Balance:

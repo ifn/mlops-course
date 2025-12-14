@@ -3,7 +3,7 @@ from typing import Optional
 
 from pydantic import BaseModel
 
-from models.user import User, Sex
+from app.models.user import User, Sex
 
 
 class UserResponse(BaseModel):

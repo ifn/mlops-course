@@ -3,7 +3,7 @@ from typing import List, Optional
 from sqlmodel import Session, select
 from sqlalchemy.orm import selectinload
 
-from models.user import User
+from app.models.user import User
 
 
 def get_all_users(session: Session) -> List[User]:

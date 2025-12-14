@@ -4,7 +4,7 @@ from typing import Optional, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 
 if TYPE_CHECKING:
-    from models.user import User
+    from app.models.user import User
 
 
 class Balance(SQLModel, table=True):

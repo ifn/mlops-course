@@ -1,0 +1,7 @@
+pika
+asyncpg
+psycopg
+psycopg-binary
+pydantic
+pydantic-settings
+sqlmodel

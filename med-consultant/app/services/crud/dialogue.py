@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from sqlmodel import Session, select
 
-from models.dialogue import Dialogue
+from app.models.dialogue import Dialogue
 
 
 def get_all_dialogues(session: Session) -> List[Dialogue]:

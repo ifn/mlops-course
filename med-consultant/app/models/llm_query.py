@@ -3,10 +3,19 @@ from typing import Optional, TYPE_CHECKING
 
 from sqlmodel import SQLModel, Field, Relationship
 
+# ?
+from app.models.ml_task import MLTaskStatus
+
 if TYPE_CHECKING:
-    from models.ml_task import MLTask, MLTaskStatus
-    from models.user import User
-    from models.dialogue import Dialogue
+    from app.models.ml_task import MLTask, MLTaskStatus
+    from app.models.user import User
+    from app.models.dialogue import Dialogue
+
+
+class LLMQueryUpdate(SQLModel):
+    response: Optional[str] = None
+    ml_task_status: Optional["MLTaskStatus"] = None
+    ml_task_termination_time: Optional[datetime] = None
 
 
 class LLMQuery(SQLModel, table=True):
@@ -34,3 +43,8 @@ class LLMQuery(SQLModel, table=True):
     @property
     def termination_time(self) -> Optional[datetime]:
         return self.ml_task.termination_time if self.ml_task else None
+
+    def update(self, llm_query_update: LLMQueryUpdate):
+        self.response = llm_query_update.response
+        self.ml_task.status = llm_query_update.ml_task_status
+        self.ml_task.termination_time = llm_query_update.ml_task_termination_time

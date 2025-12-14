@@ -5,8 +5,8 @@ from sqlmodel import SQLModel, Field, Relationship
 from sqlalchemy import Column, JSON
 
 if TYPE_CHECKING:
-    from models.user import User
-    from models.llm_query import LLMQuery
+    from app.models.user import User
+    from app.models.llm_query import LLMQuery
 
 
 class Dialogue(SQLModel, table=True):

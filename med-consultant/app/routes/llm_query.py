@@ -2,11 +2,12 @@ from typing import List
 
 from fastapi import APIRouter, Body, HTTPException, status, Depends
 
-from database.database import get_session
-from models.llm_query import LLMQuery
-from models.dialogue import Dialogue
-from services.crud import llm_query as LLMQueryService
-from services.crud import dialogue as DialogueService
+from app.database.database import get_session
+from app.models.llm_query import LLMQuery
+from app.models.dialogue import Dialogue
+from app.services.crud import llm_query as LLMQueryService
+from app.services.crud import dialogue as DialogueService
+from app.rabbitmq.client import publish_message
 
 
 llm_query_router = APIRouter()
@@ -46,6 +47,13 @@ async def create_llm_query(
         llm_query_req.dialogue_id = dialogue.id
 
     llm_query: LLMQuery = LLMQueryService.create_llm_query(session, llm_query_req)
+
+    queue_name = "ml_task_queue"
+    llm_query_js = llm_query.model_dump_json()
+    publish_message(queue_name, llm_query_js)
+
+    # create withdrawal
+
     return llm_query
 
 

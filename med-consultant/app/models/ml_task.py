@@ -5,7 +5,7 @@ from typing import Optional, TYPE_CHECKING
 from sqlmodel import SQLModel, Field, Relationship
 
 if TYPE_CHECKING:
-    from models.llm_query import LLMQuery
+    from app.models.llm_query import LLMQuery
 
 
 class MLTaskStatus(Enum):

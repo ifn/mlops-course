@@ -3,8 +3,8 @@ from typing import List, Optional
 from sqlmodel import Session, select
 from sqlalchemy.orm import selectinload
 
-from models.llm_query import LLMQuery
-from models.ml_task import MLTask
+from app.models.llm_query import LLMQuery, LLMQueryUpdate
+from app.models.ml_task import MLTask
 
 
 def get_all_llm_queries(session: Session) -> List[LLMQuery]:
@@ -68,6 +68,38 @@ def create_llm_query(session: Session, llm_query: LLMQuery) -> LLMQuery:
         session.flush()
 
         llm_query.ml_task_id = ml_task.id
+
+        session.add(llm_query)
+        session.commit()
+        session.refresh(llm_query)
+        return llm_query
+    except Exception as e:
+        session.rollback()
+        raise
+
+
+def update_llm_query(
+    session: Session,
+    llm_query_id: int,
+    llm_query_update: LLMQueryUpdate,
+) -> Optional[LLMQuery]:
+    """
+    Update existing llm_query.
+
+    Args:
+        session: Database session
+        llm_query_id: LLMQuery ID to update
+        llm_query_update: LLMQueryUpdate object
+
+    Returns:
+        Optional[LLMQuery]: Updated llm_query or None if not found
+    """
+    try:
+        llm_query = get_llm_query_by_id(session, llm_query_id)
+        if not llm_query:
+            return None
+
+        llm_query.update(llm_query_update)
 
         session.add(llm_query)
         session.commit()

@@ -3,12 +3,12 @@ import logging
 
 from fastapi import APIRouter, HTTPException, status, Depends
 
-from database.database import get_session
-from models.user import User
-from models.billing.balance import Balance
-from services.crud import user as UserService
-from services.crud.billing import balance as BalanceService
-from routes.models.user_response import UserResponse
+from app.database.database import get_session
+from app.models.user import User
+from app.models.billing.balance import Balance
+from app.services.crud import user as UserService
+from app.services.crud.billing import balance as BalanceService
+from app.routes.models.user_response import UserResponse
 
 
 logger = logging.getLogger(__name__)

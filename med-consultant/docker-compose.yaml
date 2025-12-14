@@ -1,13 +1,14 @@
 version: "3"
 
 services: 
-  app:
-    build: ./app/
+  api:
+    build: ./api/
     image: med-consultant-api:latest
     env_file:
-      - ./app/.env
+      - ./api/.env
     volumes:
-      - ./app:/app
+      - ./api:/api
+      - ./app:/api/app
     depends_on:
       - database
       - rabbitmq
@@ -19,11 +20,11 @@ services:
       - "80:80"
       - "443:443"
     depends_on:
-      - app
+      - api
     restart: unless-stopped
 
   rabbitmq:
-    image: rabbitmq:4.2.1-alpine
+    image: rabbitmq:4.2.1-management-alpine
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -52,6 +53,36 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+
+  ml_worker:
+    build: ./ml_worker/
+    image: ml-worker-llm-proxy:latest
+    restart: unless-stopped
+    env_file:
+      - ./ml_worker/.env
+    volumes:
+      - ./ml_worker:/ml_worker
+      - ./app:/ml_worker/app
+    depends_on:
+      - rabbitmq
+      - ollama
+    deploy:
+      mode: replicated
+      replicas: 2
+
+  ml_task_result_saver:
+    build: ./ml_task_result_saver/
+    image: ml-task-result-saver:latest
+    container_name: ml-task-result-saver
+    restart: unless-stopped
+    env_file:
+      - ./ml_task_result_saver/.env
+    volumes:
+      - ./ml_task_result_saver:/ml_task_result_saver
+      - ./app:/ml_task_result_saver/app
+    depends_on:
+      - rabbitmq
+      - database
 
   ollama:
     dns:

@@ -7,3 +7,4 @@ sqlmodel
 starlette
 fastapi
 uvicorn
+pika
