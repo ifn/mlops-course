@@ -73,7 +73,6 @@ services:
   ml_task_result_saver:
     build: ./ml_task_result_saver/
     image: ml-task-result-saver:latest
-    container_name: ml-task-result-saver
     restart: unless-stopped
     env_file:
       - ./ml_task_result_saver/.env
@@ -89,7 +88,6 @@ services:
       - 8.8.8.8
       - 8.8.4.4
     image: ollama/ollama:0.12.0-rc1
-    container_name: ollama
     ports:
       - "22434:11434"
     volumes:

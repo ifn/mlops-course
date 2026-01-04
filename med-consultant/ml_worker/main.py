@@ -2,13 +2,14 @@ import logging
 import json
 
 import pika
+from ollama import Client, ChatResponse
 
 from app.rabbitmq.client import publish_message
 
 
 QUEUE_NAME_IN = "ml_task_queue"
 QUEUE_NAME_OUT = "ml_task_result_queue"
-
+MODEL_NAME = "thewindmom/llama3-med42-8b"
 
 logging.basicConfig(
     level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -38,11 +39,18 @@ def main() -> None:
     def callback(ch, method, properties, body):
         logger.info(f"Received: '{body}'")
 
-        # create ollama request
-        resp = "dummy"
-
         llm_req_d = json.loads(body)
-        llm_req_d["response"] = resp
+
+        client = Client()
+        messages = [
+            {
+                "role": "user",
+                "content": llm_req_d["query"],
+            },
+        ]
+        resp: ChatResponse = client.chat(MODEL_NAME, messages=messages, stream=False)
+
+        llm_req_d["response"] = resp.message.content
         llm_req_js = json.dumps(llm_req_d)
 
         publish_message(QUEUE_NAME_OUT, llm_req_js)
