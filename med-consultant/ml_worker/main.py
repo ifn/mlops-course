@@ -1,15 +1,16 @@
+import os
 import logging
 import json
 
 import pika
-from ollama import Client, ChatResponse
+from openai import OpenAI
 
 from app.rabbitmq.client import publish_message
 
 
 QUEUE_NAME_IN = "ml_task_queue"
 QUEUE_NAME_OUT = "ml_task_result_queue"
-MODEL_NAME = "thewindmom/llama3-med42-8b"
+MODEL_NAME = "xiaomi/mimo-v2-flash:free"
 
 logging.basicConfig(
     level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -41,16 +42,25 @@ def main() -> None:
 
         llm_req_d = json.loads(body)
 
-        client = Client()
         messages = [
             {
                 "role": "user",
                 "content": llm_req_d["query"],
             },
         ]
-        resp: ChatResponse = client.chat(MODEL_NAME, messages=messages, stream=False)
+        client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=os.getenv("OPEN_ROUTER_API_KEY"),
+        )
+        response = client.chat.completions.create(
+            model=MODEL_NAME,
+            messages=messages,
+            extra_body={"reasoning": {"enabled": False}},
+        )
 
-        llm_req_d["response"] = resp.message.content
+        response = response.choices[0].message
+
+        llm_req_d["response"] = response.content
         llm_req_js = json.dumps(llm_req_d)
 
         publish_message(QUEUE_NAME_OUT, llm_req_js)

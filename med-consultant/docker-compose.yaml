@@ -65,7 +65,6 @@ services:
       - ./app:/ml_worker/app
     depends_on:
       - rabbitmq
-      - ollama
     deploy:
       mode: replicated
       replicas: 2
@@ -82,16 +81,6 @@ services:
     depends_on:
       - rabbitmq
       - database
-
-  ollama:
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
-    image: ollama/ollama:0.12.0-rc1
-    ports:
-      - "22434:11434"
-    volumes:
-      - ollama_data:/root/.ollama
 
 volumes:
   pg_data:
