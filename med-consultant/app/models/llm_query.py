@@ -23,6 +23,7 @@ class LLMQuery(SQLModel, table=True):
     query: str
     response: Optional[str] = None
 
+    # 3NF violation
     user_id: int = Field(foreign_key="user.id")
     user: "User" = Relationship(back_populates="queries")
 
