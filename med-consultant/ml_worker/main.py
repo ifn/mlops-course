@@ -10,7 +10,7 @@ from app.rabbitmq.client import publish_message
 
 QUEUE_NAME_IN = "ml_task_queue"
 QUEUE_NAME_OUT = "ml_task_result_queue"
-MODEL_NAME = "xiaomi/mimo-v2-flash:free"
+MODEL_NAME = "google/gemma-4-26b-a4b-it:free"
 
 logging.basicConfig(
     level=logging.DEBUG, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
