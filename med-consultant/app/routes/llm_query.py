@@ -7,7 +7,9 @@ from app.models.llm_query import LLMQuery
 from app.models.dialogue import Dialogue
 from app.services.crud import llm_query as LLMQueryService
 from app.services.crud import dialogue as DialogueService
+from app.services.crud import user as UserService
 from app.rabbitmq.client import publish_message
+from app.auth.authenticate import authenticate_cookie
 
 
 llm_query_router = APIRouter()
@@ -16,6 +18,7 @@ llm_query_router = APIRouter()
 @llm_query_router.get("/", response_model=List[LLMQuery])
 async def retrieve_all_llm_queries(
     session=Depends(get_session),
+    current_user: str = Depends(authenticate_cookie),
 ) -> List[LLMQuery]:
     return LLMQueryService.get_all_llm_queries(session)
 
@@ -24,6 +27,7 @@ async def retrieve_all_llm_queries(
 async def retrieve_llm_query(
     id: int,
     session=Depends(get_session),
+    current_user: str = Depends(authenticate_cookie),
 ) -> LLMQuery:
     llm_query = LLMQueryService.get_llm_query_by_id(session, id)
     if not llm_query:
@@ -38,11 +42,18 @@ async def retrieve_llm_query(
 async def create_llm_query(
     llm_query_req: LLMQuery,
     session=Depends(get_session),
+    current_user: str = Depends(authenticate_cookie),
 ) -> LLMQuery:
-    # TODO: refactor
+    # Resolve user_id from the authenticated user, ignoring whatever was in the request body
+    user = UserService.get_user_by_email(session, current_user)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    llm_query_req.user_id = user.id
+
     # Create dialogue if it is not passed in request
     if llm_query_req.dialogue_id is None:
-        dialogue = Dialogue(user_id=llm_query_req.user_id)
+        dialogue = Dialogue(user_id=user.id)
         DialogueService.create_dialogue(session, dialogue)
         llm_query_req.dialogue_id = dialogue.id
 
@@ -61,6 +72,7 @@ async def create_llm_query(
 async def delete_llm_query(
     id: int,
     session=Depends(get_session),
+    current_user: str = Depends(authenticate_cookie),
 ) -> dict:
     res = LLMQueryService.delete_llm_query(session, id)
     if not res:

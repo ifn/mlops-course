@@ -8,3 +8,7 @@ starlette
 fastapi
 uvicorn
 pika
+python-jose[cryptography]
+passlib[bcrypt]
+jinja2
+python-multipart

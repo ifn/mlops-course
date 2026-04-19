@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Medical Consultant{% endblock %}
+
+{% block content %}
+<h1>Medical Consultant</h1>
+
+{% if user %}
+    <p>Welcome, <strong>{{ user }}</strong>!</p>
+    <p>You are logged in. <a href="/api/docs">Go to API docs</a>.</p>
+{% else %}
+    <p>Please <a href="/auth/login">log in</a> to use the service.</p>
+{% endif %}
+{% endblock %}

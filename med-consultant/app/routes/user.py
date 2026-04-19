@@ -1,14 +1,21 @@
 from typing import List, Dict
 import logging
 
-from fastapi import APIRouter, HTTPException, status, Depends
+from fastapi import APIRouter, HTTPException, Response, status, Depends
+from fastapi.security import OAuth2PasswordRequestForm
 
 from app.database.database import get_session
 from app.models.user import User
 from app.models.billing.balance import Balance
+from app.auth.hash_password import HashPassword
+from app.auth.jwt_handler import create_access_token
 from app.services.crud import user as UserService
 from app.services.crud.billing import balance as BalanceService
 from app.routes.models.user_response import UserResponse
+from app.database.config import get_settings
+
+
+hash_password = HashPassword()
 
 
 logger = logging.getLogger(__name__)
@@ -83,7 +90,7 @@ async def signup(
 
         user = User(
             email=data.email,
-            password=data.password,
+            password=hash_password.create_hash(data.password),
             balance_id=balance.id,
         )
         UserService.create_user(session, user)
@@ -103,34 +110,45 @@ async def signup(
 
 @user_route.post("/signin")
 async def signin(
-    data: User,
+    response: Response,
+    form_data: OAuth2PasswordRequestForm = Depends(),
     session=Depends(get_session),
-) -> User:
+) -> Dict[str, str]:
     """
     Authenticate existing user.
 
     Args:
-        form_data: User credentials
+        response: FastAPI response (used to set httpOnly cookie)
+        form_data: OAuth2 form with username (email) and password
         session: Database session
 
     Returns:
-        dict: Success message
+        dict: access_token and token_type
 
     Raises:
         HTTPException: If authentication fails
     """
-    user = UserService.get_user_by_email(session, data.email)
+    user = UserService.get_user_by_email(session, form_data.username)
     if user is None:
-        logger.warning(f"Login attempt with non-existent email: {data.email}")
+        logger.warning(f"Login attempt with non-existent email: {form_data.username}")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User does not exist"
         )
 
-    if user.password != data.password:
-        logger.warning(f"Failed login attempt for user: {data.email}")
+    if not hash_password.verify_hash(form_data.password, user.password):
+        logger.warning(f"Failed login attempt for user: {form_data.username}")
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Wrong credentials passed",
         )
 
-    return user
+    access_token = create_access_token(user.email)
+    settings = get_settings()
+    response.set_cookie(
+        key=settings.COOKIE_NAME,
+        value=f"Bearer {access_token}",
+        httponly=True,
+    )
+
+    logger.info(f"User signed in: {user.email}")
+    return {"access_token": access_token, "token_type": "Bearer"}

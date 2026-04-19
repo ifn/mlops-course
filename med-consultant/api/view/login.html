@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Medical Consultant{% endblock %}
+
+{% block content %}
+<h1>Login</h1>
+
+{% for error in errors %}
+    <p style="color: red">{{ error }}</p>
+{% endfor %}
+
+<form action="/auth/login" method="post">
+    <p>
+        <label>Email</label><br>
+        <input type="email" name="username" required>
+    </p>
+    <p>
+        <label>Password</label><br>
+        <input type="password" name="password" required>
+    </p>
+    <input type="submit" value="Login">
+</form>
+{% endblock %}

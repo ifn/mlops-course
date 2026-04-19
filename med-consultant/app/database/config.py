@@ -19,6 +19,10 @@ class Settings(BaseSettings):
     API_VERSION: Optional[str] = None
     APP_DESCRIPTION: Optional[str] = None
 
+    # Auth settings
+    SECRET_KEY: str = "changeme"
+    COOKIE_NAME: str = "access_token"
+
     @property
     def DATABASE_URL_asyncpg(self):
         return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
